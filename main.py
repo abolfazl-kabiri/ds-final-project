@@ -46,13 +46,6 @@ def dfs(graph, num_of_vertices):
     print()
 
 
-def print_graph_edges():
-    for element in graph:
-        for edge in element:
-            print(edge.destination, edge.weight, end=' / ')
-        print()
-
-
 def find_min(distance, finalized):
     index = 0
     minimum = math.inf
@@ -93,7 +86,12 @@ def find_location():
     par_dij = list()
     avg_dis = list()
     for node in participants:
-        par_dij.append(dijkstra(graph, node))
+        if node in dijkstra_dictionary.keys():
+            par_dij.append(dijkstra_dictionary[node])
+        else:
+            new_dij = dijkstra(graph, node)
+            dijkstra_dictionary[node] = new_dij
+            par_dij.append(new_dij)
 
     for i in range(number_of_vertices):
         if i in participants:
@@ -122,6 +120,8 @@ participants = list()
 
 vertices_id = list(map(int, input().split()))
 vertices_dictionary = convert(vertices_id, vertices_dictionary, number_of_vertices)
+
+dijkstra_dictionary = dict()
 
 for _ in range(number_of_edges):
     u, v, w = list(map(int, input().split()))
