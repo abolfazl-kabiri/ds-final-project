@@ -73,7 +73,46 @@ def dijkstra(graph, source):
         for node in graph[index]:
             if not finalized[node.destination]:
                 distance[node.destination] = min(distance[node.destination], distance[index] + node.weight)
-    print(distance)
+    return distance
+
+
+def min_avg(avgs):
+    indices = list()
+    whole_min = math.inf
+    for i in range(len(avgs)):
+        if avgs[i] == whole_min:
+            indices.append(i)
+        elif avgs[i] < whole_min:
+            indices.clear()
+            indices.append(i)
+            whole_min = avgs[i]
+    return indices, whole_min
+
+
+def find_location():
+    par_dij = list()
+    avg_dis = list()
+    for node in participants:
+        par_dij.append(dijkstra(graph, node))
+
+    for i in range(number_of_vertices):
+        if i in participants:
+            avg_dis.append(math.inf)
+            continue
+        sum = 0
+        n1, n2 = 0, 1
+        while n1 < n2 and n1 < len(participants):
+            n2 = n1 + 1
+            while n2 < len(participants):
+                sum += math.fabs(par_dij[n1][i] - par_dij[n2][i])
+                n2 += 1
+            n1 += 1
+        avg_dis.append(sum / len(participants))
+    fair_vertices, whole_min = min_avg(avg_dis)
+
+    for vertex in fair_vertices:
+        print(get_vertex(vertex), end=" ")
+    print()
 
 
 number_of_vertices, number_of_edges = list(map(int, input().split()))
@@ -104,14 +143,16 @@ while True:
         node_number = int(tokens[1])
         node_number = vertices_dictionary[node_number]
         participants.append(node_number)
-        print(participants)
+        if len(participants) > 1:
+            find_location()
 
     elif command.startswith('left'):
         tokens = command.split(' ')
         node_number = int(tokens[1])
         node_number = vertices_dictionary[node_number]
         participants.remove(node_number)
-        print(participants)
+        if len(participants) > 1:
+            find_location()
 
     elif command == 'exit':
         sys.exit(1)
